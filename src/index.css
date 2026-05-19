@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0a0a0a;
+    color: #f0f0f0;
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+  }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: #111; }
+  ::-webkit-scrollbar-thumb { background: #C6F135; border-radius: 2px; }
+}
+
+@layer utilities {
+  .font-display { font-family: 'Bebas Neue', cursive; }
+  .font-mono-custom { font-family: 'Space Mono', monospace; }
+  .text-lime { color: #C6F135; }
+  .bg-lime { background: #C6F135; }
+  .border-lime { border-color: #C6F135; }
+  .hover\:bg-lime:hover { background: #C6F135; }
+}
+
+.marquee-wrapper { overflow: hidden; white-space: nowrap; }
+.marquee-track { display: inline-flex; animation: marquee 20s linear infinite; }
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.product-card:hover .product-img { transform: scale(1.05); }
+.product-img { transition: transform 0.4s ease; }
+
+input, select, textarea {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: #f0f0f0;
+  outline: none;
+  transition: border-color 0.2s;
+}
+input:focus, select:focus, textarea:focus { border-color: #C6F135; }
+
+.btn-lime {
+  background: #C6F135;
+  color: #0a0a0a;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  transition: all 0.2s;
+}
+.btn-lime:hover { background: #b5e020; transform: translateY(-1px); }
+
+.btn-outline {
+  border: 1px solid #333;
+  color: #f0f0f0;
+  transition: all 0.2s;
+}
+.btn-outline:hover { border-color: #C6F135; color: #C6F135; }
+
+.glass {
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08);
+}
