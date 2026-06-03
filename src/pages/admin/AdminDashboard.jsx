@@ -4,7 +4,11 @@ import { Package, Users, ShoppingBag, TrendingUp, ArrowRight } from 'lucide-reac
 import { useApp } from '../../context/AppContext';
 
 export default function AdminDashboard() {
-  const { products, getAllOrders, getAllUsers } = useApp();
+  const { products, getAllOrders, getAllUsers, getAdminNotifications } = useApp();
+
+  const notifications = getAdminNotifications();
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
   const orders = getAllOrders();
   const users = getAllUsers();
 
@@ -23,19 +27,43 @@ export default function AdminDashboard() {
   return (
     <div>
       <div className="mb-8">
-        <div className="text-xs font-mono-custom text-[#C6F135] uppercase tracking-widest mb-1">Overview</div>
-        <h1 className="font-display text-5xl text-white">DASHBOARD</h1>
+        <div className="text-xs font-mono-custom text-[#C6F135] uppercase tracking-widest mb-1">
+          Overview
+        </div>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="font-display text-5xl text-white">DASHBOARD</h1>
+
+          <Link to="/admin/notifications" className="relative">
+            <span className="text-2xl">🔔</span>
+
+            {unreadCount > 0 && (
+              <span
+                className="absolute -top-2 -right-2
+        bg-red-500 text-white
+        w-5 h-5 rounded-full
+        text-[10px]
+        flex items-center justify-center"
+              >
+                {unreadCount}
+              </span>
+            )}
+          </Link>
+        </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {stats.map(s => (
+        {stats.map((s) => (
           <div key={s.label} className={`p-5 bg-[#111] border border-[#222]`}>
-            <div className={`w-10 h-10 rounded-sm ${s.bg} flex items-center justify-center mb-3`}>
+            <div
+              className={`w-10 h-10 rounded-sm ${s.bg} flex items-center justify-center mb-3`}
+            >
               <s.icon size={18} className={s.color} />
             </div>
             <div className={`font-display text-3xl ${s.color}`}>{s.value}</div>
-            <div className="text-xs font-mono-custom text-gray-500 mt-1 uppercase tracking-widest">{s.label}</div>
+            <div className="text-xs font-mono-custom text-gray-500 mt-1 uppercase tracking-widest">
+              {s.label}
+            </div>
           </div>
         ))}
       </div>
@@ -44,28 +72,52 @@ export default function AdminDashboard() {
         {/* Recent Orders */}
         <div className="lg:col-span-2 bg-[#111] border border-[#222] p-6">
           <div className="flex items-center justify-between mb-5">
-            <div className="font-display text-2xl text-white">RECENT ORDERS</div>
-            <Link to="/admin/orders" className="text-xs font-mono-custom text-[#C6F135] hover:underline flex items-center gap-1">
+            <div className="font-display text-2xl text-white">
+              RECENT ORDERS
+            </div>
+            <Link
+              to="/admin/orders"
+              className="text-xs font-mono-custom text-[#C6F135] hover:underline flex items-center gap-1"
+            >
               View All <ArrowRight size={12} />
             </Link>
           </div>
           {recentOrders.length === 0 ? (
-            <div className="text-gray-500 text-sm text-center py-8">No orders yet</div>
+            <div className="text-gray-500 text-sm text-center py-8">
+              No orders yet
+            </div>
           ) : (
             <div className="space-y-1">
-              {recentOrders.map(o => (
-                <div key={o.id} className="flex items-center gap-4 py-3 border-b border-[#1a1a1a] last:border-0">
+              {recentOrders.map((o) => (
+                <div
+                  key={o.id}
+                  className="flex items-center gap-4 py-3 border-b border-[#1a1a1a] last:border-0"
+                >
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs font-mono-custom text-white">{o.id}</div>
-                    <div className="text-[10px] text-gray-500">{o.userName || o.userEmail}</div>
+                    <div className="text-xs font-mono-custom text-white">
+                      {o.id}
+                    </div>
+                    <div className="text-[10px] text-gray-500">
+                      {o.userName || o.userEmail}
+                    </div>
                   </div>
-                  <div className={`text-[10px] font-mono-custom px-2 py-0.5 uppercase tracking-wide
-                    ${o.status === 'Delivered' ? 'text-green-400 bg-green-400/10' :
-                      o.status === 'Shipped' ? 'text-blue-400 bg-blue-400/10' :
-                      o.status === 'Cancelled' ? 'text-red-400 bg-red-400/10' : 'text-yellow-400 bg-yellow-400/10'}`}>
+                  <div
+                    className={`text-[10px] font-mono-custom px-2 py-0.5 uppercase tracking-wide
+                    ${
+                      o.status === "Delivered"
+                        ? "text-green-400 bg-green-400/10"
+                        : o.status === "Shipped"
+                          ? "text-blue-400 bg-blue-400/10"
+                          : o.status === "Cancelled"
+                            ? "text-red-400 bg-red-400/10"
+                            : "text-yellow-400 bg-yellow-400/10"
+                    }`}
+                  >
                     {o.status}
                   </div>
-                  <div className="font-mono-custom text-xs text-white">${o.total.toFixed(2)}</div>
+                  <div className="font-mono-custom text-xs text-white">
+                    ${o.total.toFixed(2)}
+                  </div>
                 </div>
               ))}
             </div>
@@ -74,15 +126,21 @@ export default function AdminDashboard() {
 
         {/* Order Status Breakdown */}
         <div className="bg-[#111] border border-[#222] p-6">
-          <div className="font-display text-2xl text-white mb-5">ORDER STATUS</div>
+          <div className="font-display text-2xl text-white mb-5">
+            ORDER STATUS
+          </div>
           {Object.entries(statusCounts).length === 0 ? (
-            <div className="text-gray-500 text-sm text-center py-8">No data yet</div>
+            <div className="text-gray-500 text-sm text-center py-8">
+              No data yet
+            </div>
           ) : (
             <div className="space-y-3">
               {Object.entries(statusCounts).map(([status, count]) => (
                 <div key={status}>
                   <div className="flex justify-between text-xs font-mono-custom mb-1">
-                    <span className="text-gray-400 uppercase tracking-widest">{status}</span>
+                    <span className="text-gray-400 uppercase tracking-widest">
+                      {status}
+                    </span>
                     <span className="text-white">{count}</span>
                   </div>
                   <div className="h-1.5 bg-[#1a1a1a] rounded-full overflow-hidden">

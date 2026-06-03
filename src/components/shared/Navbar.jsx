@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Heart, User, Menu, X, Diamond, LogOut, LayoutDashboard } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
+
 export default function Navbar() {
   const { currentUser, logout, cartCount, wishlist } = useApp();
   const [menuOpen, setMenuOpen] = useState(false);

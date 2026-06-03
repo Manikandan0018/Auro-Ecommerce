@@ -22,6 +22,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminUsers from './pages/admin/AdminUsers';
+import AdminNotifications from './pages/admin/AdminNotifications';
 
 function UserLayout({ children }) {
   return (
@@ -40,16 +41,80 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           {/* User routes */}
-          <Route path="/" element={<UserLayout><Home /></UserLayout>} />
-          <Route path="/catalog" element={<UserLayout><Catalog /></UserLayout>} />
-          <Route path="/product/:id" element={<UserLayout><ProductDetail /></UserLayout>} />
+          <Route
+            path="/"
+            element={
+              <UserLayout>
+                <Home />
+              </UserLayout>
+            }
+          />
+          <Route
+            path="/catalog"
+            element={
+              <UserLayout>
+                <Catalog />
+              </UserLayout>
+            }
+          />
+          <Route
+            path="/product/:id"
+            element={
+              <UserLayout>
+                <ProductDetail />
+              </UserLayout>
+            }
+          />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/about" element={<UserLayout><About /></UserLayout>} />
-          <Route path="/cart" element={<UserLayout><ProtectedRoute><Cart /></ProtectedRoute></UserLayout>} />
-          <Route path="/wishlist" element={<UserLayout><ProtectedRoute><Wishlist /></ProtectedRoute></UserLayout>} />
-          <Route path="/orders" element={<UserLayout><ProtectedRoute><Orders /></ProtectedRoute></UserLayout>} />
-          <Route path="/profile" element={<UserLayout><ProtectedRoute><Profile /></ProtectedRoute></UserLayout>} />
+          <Route
+            path="/about"
+            element={
+              <UserLayout>
+                <About />
+              </UserLayout>
+            }
+          />
+          <Route
+            path="/cart"
+            element={
+              <UserLayout>
+                <ProtectedRoute>
+                  <Cart />
+                </ProtectedRoute>
+              </UserLayout>
+            }
+          />
+          <Route
+            path="/wishlist"
+            element={
+              <UserLayout>
+                <ProtectedRoute>
+                  <Wishlist />
+                </ProtectedRoute>
+              </UserLayout>
+            }
+          />
+          <Route
+            path="/orders"
+            element={
+              <UserLayout>
+                <ProtectedRoute>
+                  <Orders />
+                </ProtectedRoute>
+              </UserLayout>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <UserLayout>
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              </UserLayout>
+            }
+          />
 
           {/* Admin routes */}
           <Route path="/admin" element={<AdminLayout />}>
@@ -57,6 +122,8 @@ export default function App() {
             <Route path="products" element={<AdminProducts />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="users" element={<AdminUsers />} />
+            <Route path="notifications" element={<AdminNotifications/>} />
+
           </Route>
         </Routes>
       </BrowserRouter>

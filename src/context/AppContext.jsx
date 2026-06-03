@@ -17,6 +17,9 @@ export function AppProvider({ children }) {
   const [users, setUsers] = useState(() => getLS('users', []));
   const [currentUser, setCurrentUser] = useState(() => getLS('currentUser', null));
   const [notification, setNotification] = useState(null);
+  const [adminNotifications, setAdminNotifications] = useState(() =>
+    getLS("adminNotifications", []),
+  );
 
   useEffect(() => { localStorage.setItem('products', JSON.stringify(products)); }, [products]);
   useEffect(() => { localStorage.setItem('cart', JSON.stringify(cart)); }, [cart]);
@@ -29,6 +32,7 @@ export function AppProvider({ children }) {
     setNotification({ msg, type });
     setTimeout(() => setNotification(null), 2500);
   };
+
 
   // Auth
   const signup = (name, email, password) => {
@@ -48,6 +52,18 @@ export function AppProvider({ children }) {
     setCurrentUser(user);
     return { success: true };
   };
+
+
+
+    useEffect(() => {
+      localStorage.setItem(
+        "adminNotifications",
+        JSON.stringify(adminNotifications),
+      );
+    }, [adminNotifications]);
+  
+ 
+  
 
   const loginWithGoogle = (profile) => {
     let user = users.find(u => u.email === profile.email);
@@ -76,6 +92,56 @@ export function AppProvider({ children }) {
     });
     notify(`${product.name} added to cart!`);
   };
+
+
+  const cancelOrder = (orderId) => {
+  const order = orders.find(o => o.id === orderId);
+
+  if (!order) {
+    notify('Order not found', 'error');
+    return false;
+  }
+
+  if (order.status !== 'Processing') {
+    notify(
+      'Order cannot be cancelled after shipping.',
+      'error'
+    );
+    return false;
+  }
+
+  setOrders(prev =>
+    prev.map(o =>
+      o.id === orderId
+        ? {
+            ...o,
+            status: 'Cancelled',
+            cancelledAt: new Date().toISOString(),
+          }
+        : o
+    )
+  );
+
+  setAdminNotifications(prev => [
+    {
+      id: Date.now().toString(),
+      type: 'ORDER_CANCELLED',
+      orderId: order.id,
+      customer: order.userName,
+      createdAt: new Date().toISOString(),
+      read: false,
+      message: `${order.userName} cancelled order ${order.id}`,
+    },
+    ...prev,
+  ]);
+
+  notify('Order cancelled successfully');
+  return true;
+  };
+  
+
+
+
 
   const removeFromCart = (id) => setCart(prev => prev.filter(i => i.id !== id));
   const updateCartQty = (id, qty) => {
@@ -113,12 +179,52 @@ export function AppProvider({ children }) {
     return order;
   };
 
-  const updateOrderStatus = (orderId, status) => {
-    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
-    notify('Order status updated');
-  };
+
+ const updateOrderStatus = (orderId, status) => {
+   setOrders((prev) =>
+     prev.map((o) =>
+       o.id === orderId
+         ? {
+             ...o,
+             status,
+             shippedAt: status === "Shipped" ? Date.now() : o.shippedAt,
+           }
+         : o,
+     ),
+   );
+
+   notify(`Order marked as ${status}`);
+
+   if (status === "Shipped") {
+     setTimeout(
+       () => {
+         setOrders((prev) =>
+           prev.map((o) =>
+             o.id === orderId && o.status === "Shipped"
+               ? {
+                   ...o,
+                   status: "Delivered",
+                   deliveredAt: Date.now(),
+                 }
+               : o,
+           ),
+         );
+       },10000,
+      //  1 * 60 * 1000,
+     ); 
+   }
+ };
 
   const getUserOrders = () => orders.filter(o => o.userId === currentUser?.id);
+
+
+  const getAdminNotifications = () => adminNotifications;
+
+  const markNotificationRead = (id) => {
+    setAdminNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
+    );
+  };
 
   // Admin: Products
   const addProduct = (product) => {
@@ -137,20 +243,58 @@ export function AppProvider({ children }) {
     notify('Product deleted');
   };
 
+  const deleteNotification = (id) => {
+    setAdminNotifications((prev) => prev.filter((n) => n.id !== id));
+  };
+
   // Admin: Users control
   const getAllOrders = () => orders;
   const getAllUsers = () => users;
 
   return (
-    <AppContext.Provider value={{
-      products, cart, wishlist, orders, currentUser, users, notification,
-      signup, login, loginWithGoogle, logout, updateProfile,
-      addToCart, removeFromCart, updateCartQty, clearCart, cartTotal, cartCount,
-      toggleWishlist, isWishlisted,
-      placeOrder, updateOrderStatus, getUserOrders,
-      addProduct, updateProduct, deleteProduct,
-      getAllOrders, getAllUsers,
-    }}>
+    <AppContext.Provider
+      value={{
+        products,
+        cart,
+        wishlist,
+        orders,
+        currentUser,
+        users,
+        notification,
+
+        signup,
+        login,
+        loginWithGoogle,
+        logout,
+        updateProfile,
+
+        addToCart,
+        removeFromCart,
+        updateCartQty,
+        clearCart,
+        cartTotal,
+        cartCount,
+
+        toggleWishlist,
+        isWishlisted,
+
+        placeOrder,
+        updateOrderStatus,
+        cancelOrder,
+        getUserOrders,
+
+        getAdminNotifications,
+        markNotificationRead,
+        deleteNotification,
+
+        addProduct,
+        updateProduct,
+        deleteProduct,
+
+        getAllOrders,
+        getAllUsers,
+      }}
+    >
       {children}
     </AppContext.Provider>
   );
